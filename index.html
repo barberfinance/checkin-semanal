@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BarberFinance — Check-in Semanal</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black:#0D0D0D; --dark:#1A1A1A; --dark2:#222; --dark3:#2A2A2A;
+  --gold:#C9A84C; --gold-light:#F5E6C0; --gold-dim:rgba(201,168,76,.15);
+  --white:#fff; --gray:#888; --gray2:#555; --gray3:#333;
+  --green:#1B6B3A; --green-light:rgba(27,107,58,.15);
+  --red:#C0392B; --red-light:rgba(192,57,43,.12);
+  --amber:#B7770D; --amber-light:rgba(183,119,13,.12);
+  --radius:8px; --radius-lg:14px;
+  --font:'Syne',sans-serif; --mono:'DM Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--black);color:var(--white);min-height:100vh}
+
+/* HEADER */
+.hdr{background:var(--dark);border-bottom:1px solid #2A2A2A;padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:34px;height:34px;background:var(--gold);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.logo-name{font-size:15px;font-weight:800;letter-spacing:-.2px}
+.logo-sub{font-size:9px;color:rgba(255,255,255,.35)}
+.semana-badge{font-size:10px;font-weight:700;background:var(--gold-dim);color:var(--gold);border:1px solid rgba(201,168,76,.3);padding:4px 14px;border-radius:20px;letter-spacing:.06em}
+
+/* HERO */
+.hero{background:var(--dark);border-bottom:1px solid #2A2A2A;padding:36px 24px 28px;text-align:center}
+.hero-tag{display:inline-flex;align-items:center;gap:6px;font-size:9px;font-weight:700;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px;border:1px solid rgba(201,168,76,.2);padding:4px 14px;border-radius:20px}
+.hero-tag::before{content:'';width:5px;height:5px;background:var(--gold);border-radius:50%}
+.hero h1{font-size:clamp(22px,4vw,34px);font-weight:800;line-height:1.1;letter-spacing:-.5px;margin-bottom:8px}
+.hero h1 span{color:var(--gold)}
+.hero p{font-size:13px;color:rgba(255,255,255,.45);max-width:460px;margin:0 auto 20px;line-height:1.7}
+.hero-stats{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap}
+.hero-stat{font-size:11px;color:rgba(255,255,255,.35);display:flex;align-items:center;gap:5px}
+.hero-stat strong{color:var(--gold);font-weight:700;font-family:var(--mono)}
+
+/* PROGRESSO */
+.prog-wrap{background:var(--dark);border-bottom:1px solid #2A2A2A;padding:14px 24px;position:sticky;top:58px;z-index:99}
+.prog-top{display:flex;justify-content:space-between;margin-bottom:6px}
+.prog-label{font-size:10px;color:rgba(255,255,255,.35);font-weight:600;letter-spacing:.05em}
+.prog-pct{font-size:10px;color:var(--gold);font-weight:700;font-family:var(--mono)}
+.prog-bar{height:2px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,#8C6B1F,var(--gold));transition:width .3s ease;width:0%}
+.prog-steps{display:flex;gap:5px;margin-top:8px}
+.pstep{flex:1;height:24px;border-radius:4px;border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;letter-spacing:.04em;color:rgba(255,255,255,.25);cursor:pointer;transition:all .15s;padding:0 6px;white-space:nowrap}
+.pstep.active{background:var(--gold-dim);border-color:rgba(201,168,76,.4);color:var(--gold)}
+.pstep.done{background:var(--green-light);border-color:rgba(27,107,58,.4);color:#4CAF80}
+
+/* MAIN */
+.main{max-width:700px;margin:0 auto;padding:28px 20px 80px}
+
+/* SEMANA SELECTOR */
+.semana-sel{background:var(--dark);border:1px solid #2A2A2A;border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:18px}
+.semana-sel-title{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:10px}
+.semana-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.sbtn{padding:10px 6px;border-radius:var(--radius);border:1px solid #333;background:transparent;color:rgba(255,255,255,.4);font-family:var(--font);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;text-align:center}
+.sbtn:hover{border-color:#555;color:rgba(255,255,255,.7)}
+.sbtn.sel{background:var(--gold-dim);border-color:var(--gold);color:var(--gold)}
+.sbtn-sub{font-size:8px;font-weight:400;display:block;margin-top:2px;opacity:.7}
+
+/* CARD DADOS */
+.dados-card{background:var(--dark);border:1px solid #2A2A2A;border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:16px}
+.dados-title{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:12px}
+.dados-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:480px){.dados-grid{grid-template-columns:1fr}}
+.campo{display:flex;flex-direction:column;gap:4px}
+.campo label{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.35)}
+input[type=text],input[type=number],input[type=tel],textarea,select{
+  width:100%;padding:9px 12px;background:#222;border:1.5px solid #333;
+  border-radius:6px;font-size:12px;font-family:var(--font);color:var(--white);
+  outline:none;transition:border .15s;appearance:none
+}
+input[type=number]{font-family:var(--mono);font-weight:600;letter-spacing:.02em}
+input:focus,textarea:focus,select:focus{border-color:var(--gold);background:#281F00}
+textarea{resize:vertical;min-height:72px;line-height:1.6}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M1 3l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;cursor:pointer}
+select option{background:#222}
+
+/* BLOCO */
+.bloco{background:var(--dark);border:1px solid #2A2A2A;border-radius:var(--radius-lg);margin-bottom:14px;overflow:hidden}
+.bloco-hdr{padding:16px 20px;border-bottom:1px solid #2A2A2A;display:flex;align-items:center;gap:12px}
+.bloco-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.bloco-info{flex:1}
+.bloco-num{font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.4;margin-bottom:3px}
+.bloco-title{font-size:14px;font-weight:800;letter-spacing:-.2px}
+.bloco-sub{font-size:11px;opacity:.4;margin-top:2px}
+.bloco-body{padding:16px 20px;display:flex;flex-direction:column;gap:16px}
+
+.b-gold .bloco-icon{background:var(--gold-dim);color:var(--gold)}
+.b-gold .bloco-num,.b-gold .bloco-title{color:var(--gold)}
+.b-green .bloco-icon{background:var(--green-light);color:#4CAF80}
+.b-green .bloco-num,.b-green .bloco-title{color:#4CAF80}
+.b-red .bloco-icon{background:var(--red-light);color:#E87070}
+.b-red .bloco-num,.b-red .bloco-title{color:#E87070}
+.b-blue .bloco-icon{background:rgba(26,74,138,.2);color:#6BA3E8}
+.b-blue .bloco-num,.b-blue .bloco-title{color:#6BA3E8}
+.b-white .bloco-icon{background:rgba(255,255,255,.06);color:rgba(255,255,255,.6)}
+.b-white .bloco-num,.b-white .bloco-title{color:rgba(255,255,255,.85)}
+
+/* PERGUNTA */
+.perg{display:flex;flex-direction:column;gap:6px}
+.perg-label{display:flex;align-items:flex-start;gap:8px}
+.perg-n{font-size:9px;font-weight:700;font-family:var(--mono);min-width:20px;color:rgba(255,255,255,.3);padding-top:2px}
+.perg-txt{font-size:12px;line-height:1.6;color:rgba(255,255,255,.8);font-weight:500}
+.perg-hint{font-size:10px;color:rgba(255,255,255,.25);margin-left:28px;line-height:1.5}
+.inp{margin-left:28px}
+
+/* BARBEIRO CARD */
+.barbeiro-bloco{background:#222;border:1px solid #333;border-radius:var(--radius);padding:14px 16px;margin-bottom:10px}
+.barbeiro-nome-row{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.barbeiro-avatar{width:28px;height:28px;border-radius:50%;background:var(--gold-dim);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--gold);flex-shrink:0}
+.barbeiro-nome{font-size:12px;font-weight:700;color:var(--white)}
+.barbeiro-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+@media(max-width:500px){.barbeiro-grid{grid-template-columns:1fr 1fr}}
+.add-barbeiro{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border:1.5px dashed #333;border-radius:var(--radius);background:transparent;color:rgba(255,255,255,.3);font-family:var(--font);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;width:100%;margin-top:4px}
+.add-barbeiro:hover{border-color:var(--gold);color:var(--gold)}
+
+/* RADIO / CHECK */
+.radio-group,.check-group{display:flex;flex-direction:column;gap:5px}
+.radio-opt,.check-opt{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#222;border:1.5px solid #333;border-radius:6px;cursor:pointer;transition:all .12s}
+.radio-opt:hover,.check-opt:hover{border-color:#555}
+.radio-opt.sel,.check-opt.sel{background:#281F00;border-color:var(--gold)}
+.radio-opt input,.check-opt input{display:none}
+.rm{width:14px;height:14px;border-radius:50%;border:2px solid #555;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.cm{width:14px;height:14px;border-radius:3px;border:2px solid #555;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.radio-opt.sel .rm{border-color:var(--gold);background:var(--gold)}
+.radio-opt.sel .rm::after{content:'';width:5px;height:5px;background:var(--black);border-radius:50%}
+.check-opt.sel .cm{border-color:var(--gold);background:var(--gold)}
+.check-opt.sel .cm::after{content:'✓';font-size:9px;color:var(--black);font-weight:700}
+.radio-text,.check-text{font-size:12px;color:rgba(255,255,255,.7)}
+
+/* TERMÔMETRO */
+.termometro{display:flex;gap:6px;flex-wrap:wrap}
+.termo-btn{width:36px;height:36px;border-radius:6px;border:1.5px solid #333;background:transparent;color:rgba(255,255,255,.4);font-family:var(--mono);font-size:12px;font-weight:700;cursor:pointer;transition:all .12s}
+.termo-btn:hover{border-color:#555;color:rgba(255,255,255,.7)}
+.termo-btn.sel-0,.termo-btn.sel-1,.termo-btn.sel-2,.termo-btn.sel-3{background:var(--red-light);border-color:var(--red);color:#E87070}
+.termo-btn.sel-4,.termo-btn.sel-5,.termo-btn.sel-6{background:var(--amber-light);border-color:var(--amber);color:#E8A030}
+.termo-btn.sel-7,.termo-btn.sel-8{background:var(--gold-dim);border-color:var(--gold);color:var(--gold)}
+.termo-btn.sel-9,.termo-btn.sel-10{background:var(--green-light);border-color:var(--green);color:#4CAF80}
+
+/* DIVIDER */
+.divider{height:1px;background:linear-gradient(90deg,transparent,#2A2A2A,transparent);margin:2px 0}
+
+/* SUBMIT */
+.submit-area{background:var(--dark);border:1px solid #2A2A2A;border-radius:var(--radius-lg);padding:24px 20px;text-align:center;margin-top:8px}
+.submit-title{font-size:16px;font-weight:800;margin-bottom:6px;letter-spacing:-.2px}
+.submit-sub{font-size:12px;color:rgba(255,255,255,.35);margin-bottom:20px;line-height:1.6}
+.btn-enviar{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:var(--black);font-family:var(--font);font-size:13px;font-weight:800;padding:12px 28px;border-radius:6px;border:none;cursor:pointer;transition:all .15s;letter-spacing:.02em}
+.btn-enviar:hover{background:#E8C86A;transform:translateY(-1px)}
+.submit-note{font-size:10px;color:rgba(255,255,255,.2);margin-top:12px;line-height:1.6}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--dark);border:1px solid var(--gold);border-radius:var(--radius);padding:10px 18px;font-size:12px;font-weight:600;color:var(--gold);z-index:999;opacity:0;transition:all .3s;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="logo">
+    <div class="logo-icon">✂</div>
+    <div>
+      <div class="logo-name">BarberFinance</div>
+      <div class="logo-sub">Check-in Semanal</div>
+    </div>
+  </div>
+  <div class="semana-badge">ACOMPANHAMENTO SEMANAL</div>
+</header>
+
+<section class="hero">
+  <div class="hero-tag">Cadeira de Dono · Paulo Henrique</div>
+  <h1>Check-in da<br><span>Semana</span></h1>
+  <p>Responda com honestidade. Seus números desta semana constroem o diagnóstico da próxima live.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong>~10</strong> minutos</div>
+    <div class="hero-stat"><strong>100%</strong> confidencial</div>
+  </div>
+</section>
+
+<div class="prog-wrap">
+  <div class="prog-top">
+    <span class="prog-label">PROGRESSO</span>
+    <span class="prog-pct" id="pct">0%</span>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="fill"></div></div>
+  <div class="prog-steps">
+    <div class="pstep active" onclick="scrollSec(1)">01 · Semana</div>
+    <div class="pstep" onclick="scrollSec(2)">02 · Financeiro</div>
+    <div class="pstep" onclick="scrollSec(3)">03 · Barbeiros</div>
+    <div class="pstep" onclick="scrollSec(4)">04 · Operação</div>
+    <div class="pstep" onclick="scrollSec(5)">05 · Missão</div>
+  </div>
+</div>
+
+<main class="main">
+
+  <!-- DADOS -->
+  <div class="dados-card">
+    <div class="dados-title">Seus dados</div>
+    <div class="dados-grid">
+      <div class="campo"><label>Nome completo *</label><input type="text" id="d_nome" placeholder="Seu nome" oninput="atualizar()"></div>
+      <div class="campo"><label>Nome da barbearia *</label><input type="text" id="d_barbearia" placeholder="Nome da barbearia" oninput="atualizar()"></div>
+      <div class="campo"><label>WhatsApp *</label><input type="tel" id="d_whats" placeholder="(62) 9 9999-9999" oninput="atualizar()"></div>
+      <div class="campo"><label>Data do check-in</label><input type="text" id="d_data" placeholder="Ex: 07/05/2026" oninput="atualizar()"></div>
+    </div>
+  </div>
+
+  <!-- BLOCO 1 — SEMANA -->
+  <div class="bloco b-gold" id="sec1">
+    <div class="bloco-hdr">
+      <div class="bloco-icon">📅</div>
+      <div class="bloco-info">
+        <div class="bloco-num">Bloco 01 de 05</div>
+        <div class="bloco-title">Qual semana estamos?</div>
+        <div class="bloco-sub">Selecione a semana atual do método</div>
+      </div>
+    </div>
+    <div class="bloco-body">
+      <div class="semana-btns" id="semana_sel">
+        <button class="sbtn" onclick="selSemana(1,this)">Semana 1<span class="sbtn-sub">Raio-X financeiro</span></button>
+        <button class="sbtn" onclick="selSemana(2,this)">Semana 2<span class="sbtn-sub">Separação PF/PJ</span></button>
+        <button class="sbtn" onclick="selSemana(3,this)">Semana 3<span class="sbtn-sub">Precificação</span></button>
+        <button class="sbtn" onclick="selSemana(4,this)">Semana 4<span class="sbtn-sub">Primeiro DRE</span></button>
+      </div>
+
+      <div class="perg">
+        <div class="perg-label"><span class="perg-n">Q1</span><span class="perg-txt">De 0 a 10, quanto você executou da missão da semana passada?</span></div>
+        <div class="perg-hint">0 = não fiz nada · 10 = fiz tudo e mais</div>
+        <div class="inp">
+          <div class="termometro" id="termo">
+            <button class="termo-btn" onclick="selTermo(0,this)">0</button>
+            <button class="termo-btn" onclick="selTermo(1,this)">1</button>
+            <button class="termo-btn" onclick="selTermo(2,this)">2</button>
+            <button class="termo-btn" onclick="selTermo(3,this)">3</button>
+            <button class="termo-btn" onclick="selTermo(4,this)">4</button>
+            <button class="termo-btn" onclick="selTermo(5,this)">5</button>
+            <button class="termo-btn" onclick="selTermo(6,this)">6</button>
+            <button class="termo-btn" onclick="selTermo(7,this)">7</button>
+            <button class="termo-btn" onclick="selTermo(8,this)">8</button>
+            <button class="termo-btn" onclick="selTermo(9,this)">9</button>
+            <button class="termo-btn" onclick="selTermo(10,this)">10</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="perg">
+        <div class="perg-label"><span class="perg-n">Q2</span><span class="perg-txt">O que você conseguiu fazer essa semana? Descreva com suas palavras.</span></div>
+        <div class="inp"><textarea id="q2" placeholder="Ex: Abri a conta PJ no Nubank, defini meu pró-labore em R$2.500..." oninput="atualizar()"></textarea></div>
+      </div>
+
+      <div class="perg">
+        <div class="perg-label"><span class="perg-n">Q3</span><span class="perg-txt">O que travou? Qual foi a maior dificuldade da semana?</span></div>
+        <div class="inp"><textarea id="q3" placeholder="Ex: Não consegui separar os gastos pessoais dos da barbearia ainda..." oninput="atualizar()"></textarea></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 2 — FINANCEIRO -->
+  <div class="bloco b-gold" id="sec2">
+    <div class="bloco-hdr">
+      <div class="bloco-icon">💰</div>
+      <div class="bloco-info">
+        <div class="bloco-num">Bloco 02 de 05</div>
+        <div class="bloco-title">Números da semana</div>
+        <div class="bloco-sub">Preencha o que conseguir — estimativas são válidas</div>
+      </div>
+    </div>
+    <div class="bloco-body">
+
+      <div class="perg">
+        <div class="perg-label"><span class="perg-n">Q4</span><span class="perg-txt">Qual foi o faturamento bruto total da barbearia nessa semana?</span></div>
+        <div class="perg-hint">Tudo que entrou no caixa — serviços + produtos + planos</div>
+        <div class="inp"><input type="number" id="q4" placeholder="Ex: 4800" oninput="atualizar()"></div>
+      </div>
+      <div class="divider"></div>
+
+      <div class="perg">
+        <div class="perg-label"><span class="perg-n">Q5</span><span class="perg-txt">Quantos atendimentos foram realizados no total esta semana?</span></div>
+        <div class="inp"><input type="number" id="q5" placeholder="Ex: 78" oninput="atualizar()"></div>
+      </div>
+      <div class="divider"></div>
+
+      <div class="perg">
+        <div class="perg-label"><span class="perg-n">Q6</span><span class="perg-txt">Quanto foi pago em comissões/repasses para os barbeiros essa semana?</span></div>
+        <div class="inp"><input type="number" id="q6" placeholder="Ex: 2100" oninput="atualizar()"></div>
+      </div>
+      <div class="divider"></div>
+
+      <div class="perg">
+        <div class="perg-label"><span class="perg-n">Q7</span><span class="perg-txt">Teve alguma despesa extra fora do normal essa semana? Se sim, qual e quanto?</span></div>
+        <div class="inp"><textarea id="q7" placeholder="Ex: Comprei produtos para reposição R$380, paguei manutenção da cadeira R$150..." oninput="atualizar()"></textarea></div>
+      </div>
+      <div class="divider"></div>
+
+      <div class="perg">
+        <div class="perg-label"><span class="perg-n">Q8</span><span class="perg-txt">Você retirou algum valor do caixa para gastos pessoais essa semana?</span></div>
+        <div class="inp">
+          <div class="radio-group" id="q8r">
+            <label class="radio-opt" onclick="selRadio(this,'q8r')"><input type="radio" name="q8r" value="Não retirei nada"><div class="rm"></div><span class="radio-text">Não retirei nada — usei só o pró-labore</span></label>
+            <label class="radio-opt" onclick="selRadio(this,'q8r')"><input type="radio" name="q8r" value="Retirei pouco"><div class="rm"></div><span class="radio-text">Retirei pouco, mas foi necessário</span></label>
+            <label class="radio-opt" onclick="selRadio(this,'q8r')"><input type="radio" name="q8r" value="Retirei bastante"><div class="rm"></div><span class="radio-text">Retirei bastante do caixa</span></label>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BLOCO 3 — BARBEIROS -->
+  <div class="bloco b-green" id="sec3">
+    <div class="bloco-hdr">
+      <div class="bloco-icon">✂</div>
+      <div class="bloco-info">
+        <div class="bloco-num">Bloco 03 de 05</div>
+        <div class="bloco-title">Desempenho por barbeiro</div>
+        <div class="bloco-sub">Faturamento, atendimentos e tempo ocioso de cada cadeira</div>
+      </div>
+    </div>
+    <div class="bloco-body">
+
+      <div id="barbeiros-lista">
+        <div class="barbeiro-bloco" id="barb_0">
+          <div class="barbeiro-nome-row">
+            <div class="barbeiro-avatar">1</div>
+            <input type="text" id="barb_0_nome" placeholder="Nome do barbeiro" style="flex:1" oninput="atualizar()">
+          </div>
+          <div class="barbeiro-grid">
+            <div class="campo"><label>Faturamento (R$)</label><input type="number" id="barb_0_fat" placeholder="0" oninput="atualizar()"></div>
+            <div class="campo"><label>Atendimentos</label><input type="number" id="barb_0_atend" placeholder="0" oninput="atualizar()"></div>
+            <div class="campo"><label>Horas trabalhadas</label><input type="number" id="barb_0_horas" placeholder="0" oninput="atualizar()"></div>
+            <div class="campo"><label>Horas ociosas (est.)</label><input type="number" id="barb_0_ocioso" placeholder="0" oninput="atualizar()"></div>
+            <div class="campo"><label>Comissão paga (R$)</label><input type="number" id="barb_0_comissao" placeholder="0" oninput="atualizar()"></div>
+            <div class="campo"><label>Vendeu produto?</label>
+              <select id="barb_0_produto" onchange="atualizar()">
+                <option value="">Selecione</option>
+                <option>Sim, acima da meta</option>
+                <option>Sim, dentro da meta</option>
+                <option>Não vendeu</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="add-barbeiro" onclick="addBarbeiro()">+ Adicionar outro barbeiro</button>
+
+      <div class="perg">
+        <div class="perg-label"><span class="perg-n">Q9</span><span class="perg-txt">Qual barbeiro teve o melhor desempenho na semana? Por quê?</span></div>
+        <div class="inp"><textarea id="q9" placeholder="Ex: O Lucas fechou mais combos e ainda vendeu 3 produtos..." oninput="atualizar()"></textarea></div>
+      </div>
+
+      <div class="perg">
+        <div class="perg-label"><span class="perg-n">Q10</span><span class="perg-txt">Algum barbeiro teve problema de postura, atraso ou faltou? O que aconteceu?</span></div>
+        <div class="inp"><textarea id="q10" placeholder="Ex: O Cauan chegou atrasado 2x. Precisamos conversar sobre isso..." oninput="atualizar()"></textarea></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BLOCO 4 — OPERAÇÃO -->
+  <div class="bloco b-blue" id="sec4">
+    <div class="bloco-hdr">
+      <div class="bloco-icon">⚙️</div>
+      <div class="bloco-info">
+        <div class="bloco-num">Bloco 04 de 05</div>
+        <div class="bloco-title">Operação da semana</div>
+        <div class="bloco-sub">Como a barbearia rodou no dia a dia</div>
+      </div>
+    </div>
+    <div class="bloco-body">
+
+      <div class="perg">
+        <div class="perg-label"><span class="perg-n">Q11</span><span class="perg-txt">Quantos clientes novos vieram essa semana?</span></div>
+        <div class="inp"><input type="number" id="q11" placeholder="Ex: 8" oninput="atualizar()"></div>
+      </div>
+      <div class="divider"></div>
+
+      <div class="perg">
+        <div class="perg-label"><span class="perg-n">Q12</span><span class="perg-txt">Teve no-show (cliente que agendou e não veio)? Quantos?</span></div>
+        <div class="inp"><input type="number" id="q12" placeholder="Ex: 3" oninput="atualizar()"></div>
+      </div>
+      <div class="divider"></div>
+
+      <div class="perg">
+        <div class="perg-label"><span class="perg-n">Q13</span><span class="perg-txt">A barbearia funcionou normalmente quando você não estava presente?</span></div>
+        <div class="inp">
+          <div class="radio-group" id="q13r">
+            <label class="radio-opt" onclick="selRadio(this,'q13r')"><input type="radio" name="q13r" value="Sim funcionou normalmente"><div class="rm"></div><span class="radio-text">Sim, funcionou normalmente</span></label>
+            <label class="radio-opt" onclick="selRadio(this,'q13r')"><input type="radio" name="q13r" value="Funcionou com pequenos problemas"><div class="rm"></div><span class="radio-text">Funcionou mas com pequenos problemas</span></label>
+            <label class="radio-opt" onclick="selRadio(this,'q13r')"><input type="radio" name="q13r" value="Tive que intervir"><div class="rm"></div><span class="radio-text">Tive que intervir várias vezes</span></label>
+            <label class="radio-opt" onclick="selRadio(this,'q13r')"><input type="radio" name="q13r" value="Fiquei o tempo todo"><div class="rm"></div><span class="radio-text">Fiquei lá o tempo todo</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="divider"></div>
+
+      <div class="perg">
+        <div class="perg-label"><span class="perg-n">Q14</span><span class="perg-txt">Teve algum problema com cliente? Reclamação, insatisfação ou conflito?</span></div>
+        <div class="inp"><textarea id="q14" placeholder="Ex: Um cliente reclamou do tempo de espera. Conversamos e resolvemos..." oninput="atualizar()"></textarea></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BLOCO 5 — MISSÃO -->
+  <div class="bloco b-white" id="sec5">
+    <div class="bloco-hdr">
+      <div class="bloco-icon">🎯</div>
+      <div class="bloco-info">
+        <div class="bloco-num">Bloco 05 de 05</div>
+        <div class="bloco-title">Foco e próxima semana</div>
+        <div class="bloco-sub">O que você quer resolver antes da próxima live</div>
+      </div>
+    </div>
+    <div class="bloco-body">
+
+      <div class="perg">
+        <div class="perg-label"><span class="perg-n">Q15</span><span class="perg-txt">Qual é sua maior preocupação financeira agora — nesta semana?</span></div>
+        <div class="inp"><textarea id="q15" placeholder="Ex: Não sei se vou conseguir pagar os barbeiros na sexta..." oninput="atualizar()"></textarea></div>
+      </div>
+      <div class="divider"></div>
+
+      <div class="perg">
+        <div class="perg-label"><span class="perg-n">Q16</span><span class="perg-txt">Tem alguma decisão importante que você precisa tomar e está travado? O que é?</span></div>
+        <div class="inp"><textarea id="q16" placeholder="Ex: Estou pensando em contratar mais um barbeiro mas não sei se o caixa aguenta..." oninput="atualizar()"></textarea></div>
+      </div>
+      <div class="divider"></div>
+
+      <div class="perg">
+        <div class="perg-label"><span class="perg-n">Q17</span><span class="perg-txt">O que você quer que Paulo foque na próxima live?</span></div>
+        <div class="inp"><textarea id="q17" placeholder="Ex: Quero entender melhor como calcular o ponto de equilíbrio dos planos..." oninput="atualizar()"></textarea></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SUBMIT -->
+  <div class="submit-area">
+    <div class="submit-title">Pronto para a próxima live?</div>
+    <div class="submit-sub">Suas respostas chegam direto para Paulo antes da call de acompanhamento.</div>
+    <button class="btn-enviar" onclick="enviar()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.66A2 2 0 012 .99h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+      Enviar pelo WhatsApp
+    </button>
+    <div class="submit-note">BarberFinance · Paulo Henrique · (62) 9 9949-8799</div>
+  </div>
+
+</main>
+
+<div class="toast" id="toast">✓ Abrindo WhatsApp...</div>
+
+<script>
+const WHATS = '5562999498799';
+let semanaAtual = 0;
+let termoVal = -1;
+let barbeiroCount = 1;
+
+function selSemana(n, el) {
+  semanaAtual = n;
+  document.querySelectorAll('.sbtn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  atualizar();
+}
+
+function selTermo(n, el) {
+  termoVal = n;
+  document.querySelectorAll('.termo-btn').forEach(b => {
+    b.className = 'termo-btn';
+  });
+  el.classList.add('sel-' + n);
+  atualizar();
+}
+
+function selRadio(el, name) {
+  document.querySelectorAll(`[id="${name}"] .radio-opt`).forEach(o => o.classList.remove('sel'));
+  el.classList.add('sel');
+  atualizar();
+}
+
+function getRadio(name) {
+  const sel = document.querySelector(`[id="${name}"] .radio-opt.sel input`);
+  return sel ? sel.value : '—';
+}
+
+function addBarbeiro() {
+  const i = barbeiroCount++;
+  const div = document.createElement('div');
+  div.className = 'barbeiro-bloco';
+  div.id = `barb_${i}`;
+  div.innerHTML = `
+    <div class="barbeiro-nome-row">
+      <div class="barbeiro-avatar">${i+1}</div>
+      <input type="text" id="barb_${i}_nome" placeholder="Nome do barbeiro" style="flex:1" oninput="atualizar()">
+    </div>
+    <div class="barbeiro-grid">
+      <div class="campo"><label>Faturamento (R$)</label><input type="number" id="barb_${i}_fat" placeholder="0" oninput="atualizar()"></div>
+      <div class="campo"><label>Atendimentos</label><input type="number" id="barb_${i}_atend" placeholder="0" oninput="atualizar()"></div>
+      <div class="campo"><label>Horas trabalhadas</label><input type="number" id="barb_${i}_horas" placeholder="0" oninput="atualizar()"></div>
+      <div class="campo"><label>Horas ociosas (est.)</label><input type="number" id="barb_${i}_ocioso" placeholder="0" oninput="atualizar()"></div>
+      <div class="campo"><label>Comissão paga (R$)</label><input type="number" id="barb_${i}_comissao" placeholder="0" oninput="atualizar()"></div>
+      <div class="campo"><label>Vendeu produto?</label>
+        <select id="barb_${i}_produto" onchange="atualizar()">
+          <option value="">Selecione</option>
+          <option>Sim, acima da meta</option>
+          <option>Sim, dentro da meta</option>
+          <option>Não vendeu</option>
+        </select>
+      </div>
+    </div>`;
+  document.getElementById('barbeiros-lista').appendChild(div);
+}
+
+function v(id) { return document.getElementById(id)?.value?.trim() || '—'; }
+
+function atualizar() {
+  const campos = [
+    v('d_nome'), v('d_barbearia'), semanaAtual > 0 ? '1' : '',
+    termoVal >= 0 ? '1' : '', v('q2'), v('q3'),
+    v('q4'), v('q5'), v('q6'), getRadio('q8r'),
+    v('barb_0_nome'), v('barb_0_fat'), v('barb_0_atend'),
+    getRadio('q13r'), v('q15'), v('q17')
+  ];
+  const filled = campos.filter(c => c && c !== '—').length;
+  const pct = Math.round((filled / campos.length) * 100);
+  document.getElementById('fill').style.width = pct + '%';
+  document.getElementById('pct').textContent = pct + '%';
+}
+
+function getBarbeiros() {
+  let txt = '';
+  for (let i = 0; i < barbeiroCount; i++) {
+    const nome = v(`barb_${i}_nome`);
+    if (nome === '—') continue;
+    const fat = v(`barb_${i}_fat`);
+    const atend = v(`barb_${i}_atend`);
+    const horas = v(`barb_${i}_horas`);
+    const ocioso = v(`barb_${i}_ocioso`);
+    const comissao = v(`barb_${i}_comissao`);
+    const produto = v(`barb_${i}_produto`);
+    const lucro = (fat !== '—' && comissao !== '—') ? `R$ ${(parseFloat(fat)||0) - (parseFloat(comissao)||0)}` : 'Calcular';
+    const ticket = (fat !== '—' && atend !== '—' && parseInt(atend) > 0) ? `R$ ${Math.round((parseFloat(fat)||0) / (parseInt(atend)||1))}` : '—';
+    txt += `\n   ${nome}: Fat R$${fat} | ${atend} atend. | Ticket ~${ticket} | Comissão R$${comissao} | Lucro cadeira: ${lucro} | Horas: ${horas}h | Ocioso: ${ocioso}h | Produto: ${produto}`;
+  }
+  return txt || '—';
+}
+
+function enviar() {
+  const nome = v('d_nome');
+  if (nome === '—') { alert('Preencha seu nome antes de enviar.'); return; }
+
+  const semanas = ['—','Semana 1 — Raio-X financeiro','Semana 2 — Separação PF/PJ','Semana 3 — Precificação real','Semana 4 — Primeiro DRE'];
+  const semTxt = semanaAtual > 0 ? semanas[semanaAtual] : '—';
+  const termoTxt = termoVal >= 0 ? `${termoVal}/10` : '—';
+
+  const fat = parseFloat(v('q4')) || 0;
+  const atend = parseInt(v('q5')) || 0;
+  const comissao = parseFloat(v('q6')) || 0;
+  const ticketMedio = atend > 0 ? `R$ ${Math.round(fat / atend)}` : '—';
+  const lucroEstimado = fat > 0 ? `R$ ${(fat - comissao).toFixed(0)}` : '—';
+
+  const msg =
+`✂ *BARBERFINANCE — CHECK-IN SEMANAL*
+━━━━━━━━━━━━━━━━━━━━━
+
+*IDENTIFICAÇÃO*
+Nome: ${nome}
+Barbearia: ${v('d_barbearia')}
+WhatsApp: ${v('d_whats')}
+Data: ${v('d_data')}
+Semana do método: ${semTxt}
+
+━━━━━━━━━━━━━━━━━━━━━
+*BLOCO 01 — SEMANA*
+
+Termômetro de execução: ${termoTxt}
+O que conseguiu fazer: ${v('q2')}
+O que travou: ${v('q3')}
+
+━━━━━━━━━━━━━━━━━━━━━
+*BLOCO 02 — FINANCEIRO*
+
+Faturamento bruto semana: R$ ${v('q4')}
+Total de atendimentos: ${v('q5')}
+Ticket médio calculado: ${ticketMedio}
+Comissões/repasses pagos: R$ ${v('q6')}
+Lucro estimado semana: ${lucroEstimado}
+Despesas extras: ${v('q7')}
+Retirada pessoal do caixa: ${getRadio('q8r')}
+
+━━━━━━━━━━━━━━━━━━━━━
+*BLOCO 03 — BARBEIROS*
+${getBarbeiros()}
+
+Melhor desempenho: ${v('q9')}
+Problemas de equipe: ${v('q10')}
+
+━━━━━━━━━━━━━━━━━━━━━
+*BLOCO 04 — OPERAÇÃO*
+
+Clientes novos: ${v('q11')}
+No-shows: ${v('q12')}
+Barbearia sem você: ${getRadio('q13r')}
+Problemas com clientes: ${v('q14')}
+
+━━━━━━━━━━━━━━━━━━━━━
+*BLOCO 05 — FOCO*
+
+Maior preocupação financeira: ${v('q15')}
+Decisão travada: ${v('q16')}
+Foco da próxima live: ${v('q17')}
+
+━━━━━━━━━━━━━━━━━━━━━
+_Check-in via BarberFinance · Cadeira de Dono_`;
+
+  window.open(`https://wa.me/${WHATS}?text=${encodeURIComponent(msg)}`, '_blank');
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function scrollSec(n) {
+  document.getElementById('sec' + n)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.querySelectorAll('.pstep').forEach((s, i) => s.classList.toggle('active', i === n - 1));
+}
+
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const n = parseInt(e.target.id.replace('sec', ''));
+      document.querySelectorAll('.pstep').forEach((s, i) => s.classList.toggle('active', i === n - 1));
+    }
+  });
+}, { threshold: 0.3 });
+['sec1','sec2','sec3','sec4','sec5'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) obs.observe(el);
+});
+</script>
+</body>
+</html>
